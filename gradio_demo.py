@@ -302,79 +302,124 @@ with gr.Blocks(
         background-clip: text;
         color: transparent !important;
     }
-    
-    #my_radio .wrap {
-        display: flex;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
+
+    .section {
+        border: 1px solid #38bdf8; /* 更柔和的蓝色 */
+        border-radius: 12px;
+        padding: 20px;
+        margin: 16px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* 柔和阴影 */
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    #my_radio .wrap label {
-        display: flex;
-        width: 50%;
-        justify-content: center;
-        align-items: center;
-        margin: 0;
-        padding: 10px 0;
-        box-sizing: border-box;
+    .section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08); /* 悬停时提升视觉效果 */
+    }
+
+    .section-title {
+        font-weight: 600;
+        font-size: 20px;
+        color: #0284c7; /* 更深的蓝色增强可读性 */
+        margin-bottom: 12px;
+        border-left: 4px solid #0ea5e9;
+        padding-left: 10px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* 现代字体 */
+    }
+
+    .examples-container {
+        text-align: left; /* Align examples to the left */
     }
     """,
 ) as demo:
     gr.Markdown("# Prompt-to-Prompt Gradio Demo")
     original_image_latent = gr.State()
-    
+
     with gr.Row():
-        with gr.Column():
+        with gr.Column(scale=1, elem_classes=["section"]):
+            gr.Markdown("### Input Section", elem_classes=["section-title"])
             image_input = gr.Image(height=384, width=384, label="Input Image", type="numpy", interactive=True, show_download_button=True)
-            with gr.Row():
-                original_prompt = gr.Textbox(label="Edit prompt", placeholder="Enter your original prompt here")        
-                original_generate_button = gr.Button("Generate", elem_id="my_button")
+            original_prompt = gr.Textbox(label="Original Prompt", placeholder="Enter your original prompt here")
+            original_generate_button = gr.Button("Generate Original Image", elem_id="my_button")
 
-
-        with gr.Column():
-            output_final = gr.Image(height=384, width=384, label="Edited Image", interactive=True, show_download_button=True)
-            with gr.Row():
-                edited_prompt = gr.Textbox(label="Edit prompt", placeholder="Enter your edit prompt here")        
-                edit_generate_button = gr.Button("Generate", elem_id="my_button")
+        with gr.Column(scale=1, elem_classes=["section"]):
+            gr.Markdown("### Output Section", elem_classes=["section-title"])
+            output_final = gr.Image(height=384, width=384, label="Edited Image", interactive=False, show_download_button=True)
+            edited_prompt = gr.Textbox(label="Edited Prompt", placeholder="Enter your edited prompt here")
+            edit_generate_button = gr.Button("Generate Edited Image", elem_id="my_button")
 
     with gr.Row():
-        offsets_input = gr.Textbox(label="Offsets (left,right,top,bottom)", value="0,0,0,0")
-        guidance_scale = gr.Number(value=7.5, label='Guidance scale', interactive=True)
-        num_ddim_steps = gr.Number(value=50, label='Diffusion steps', interactive=True)
-    
-    with gr.Row():
-        cross_replace_steps_input = gr.Number(value=0.8, label="Cross Replace Steps", interactive=True, minimum=0.0, maximum=1.0, step=0.1)
-        self_replace_steps_input = gr.Number(value=0.4, label="Self Replace Steps", interactive=True, minimum=0.0, maximum=1.0, step=0.1)     
-
-    with gr.Row():
-        blend_word_str = gr.Textbox(
-            label="Blend Words",
-            placeholder="Enter blend words in 'word1_in_original-word1_in_edit, word2_in_original-word2_in_edit' format"
-        )
-
-    with gr.Tab("Replace/Refine"):   
-        gr.Markdown("# Replace/Refine mode configuration")
-        is_replace_controller = gr.Checkbox(label="Enable Replace Controller", value=False, interactive=True)
-        replace_info = gr.Markdown("Replace Controller is disabled. This mode will refine cross-attention layers.",
-                                   elem_classes=["custom-log"])
-
-        
-        is_replace_controller.change(
-            toggle_replace_controller,
-            inputs=[is_replace_controller],
-            outputs=[replace_info],
-        )
-
-    with gr.Tab("Reweight"):   
-        gr.Markdown("# Reweight Parameters Configuration")
-
-        with gr.Row():
+        with gr.Column(scale=1, elem_classes=["section"]):
+            gr.Markdown("### Advanced Parameters", elem_classes=["section-title"])
+            offsets_input = gr.Textbox(label="Offsets (left,right,top,bottom)", value="0,0,0,0")
+            blend_word_str = gr.Textbox(
+                label="Blend Words",
+                placeholder="Enter blend words in 'word1_in_original-word1_in_edit, word2_in_original-word2_in_edit' format"
+            )
             eq_str_input = gr.Textbox(
                 label="Equalizer Input",
                 placeholder="Enter words and weights in 'word1-weight1, word2-weight2' format",
             )
 
+        with gr.Column(scale=1, elem_classes=["section"]):
+            guidance_scale = gr.Number(value=7.5, label='Guidance Scale', interactive=True)
+            num_ddim_steps = gr.Number(value=50, label='Diffusion Steps', interactive=True)
+            cross_replace_steps_input = gr.Number(value=0.8, label="Cross Replace Steps", interactive=True, minimum=0.0, maximum=1.0, step=0.1)
+            self_replace_steps_input = gr.Number(value=0.4, label="Self Replace Steps", interactive=True, minimum=0.0, maximum=1.0, step=0.1)
+
+    with gr.Row():
+        with gr.Tab("Replace/Refine", elem_classes=["section"]):
+            gr.Markdown("### Replace/Refine Mode Configuration", elem_classes=["section-title"])
+            is_replace_controller = gr.Checkbox(label="Enable Replace Controller", value=False, interactive=True)
+            replace_info = gr.Markdown("Replace Controller is disabled. This mode will refine cross-attention layers.",
+                                       elem_classes=["custom-log"])
+            is_replace_controller.change(
+                toggle_replace_controller,
+                inputs=[is_replace_controller],
+                outputs=[replace_info],
+            )
+
+    # Example Section
+    with gr.Row(elem_classes=["section", "examples-container"]):  # Add "examples-container" class
+        examples = [
+            [
+                cat_image,
+                "0,0,200,0",
+                "a cat sitting next to a mirror",
+                "a tiger sitting next to a mirror",
+                'tiger-2.0',  
+                "cat-tiger",
+                True,
+                7.5,
+                50,
+                0.8,
+                0.5,
+            ],
+        ]
+        gr.Examples(
+            examples=examples,
+            inputs=[
+                image_input,
+                offsets_input,
+                original_prompt,
+                edited_prompt,
+                eq_str_input,
+                blend_word_str,
+                is_replace_controller,
+                guidance_scale,
+                num_ddim_steps,
+                cross_replace_steps_input,
+                self_replace_steps_input,
+            ],
+            outputs=[
+                output_final
+            ],
+            fn=pipeline,
+            cache_examples=False,
+            examples_per_page=50,
+        )
+
+    # Button Click Handlers
     original_generate_button.click(
         fn=generate_pic_from_original_prompt,
         inputs=[original_prompt, num_ddim_steps, guidance_scale],
@@ -382,57 +427,15 @@ with gr.Blocks(
     )
     
     edit_generate_button.click(
-    fn=pipeline,
-    inputs=[
-        image_input, offsets_input, original_prompt, edited_prompt, 
-        eq_str_input, blend_word_str, is_replace_controller,
-        guidance_scale, num_ddim_steps, cross_replace_steps_input, self_replace_steps_input,
-        original_image_latent
-    ],
-    outputs=[output_final]
-    )
-
-    # ---------------------- Examples section ----------------------
-    examples = [
-        [
-            cat_image,
-            "0,0,200,0",
-            "a cat sitting next to a mirror",
-            "a tiger sitting next to a mirror",
-            'tiger-2.0',  
-            "cat-tiger",
-            True,
-            7.5,
-            50,
-            0.8,
-            0.5,
-        ],
-    ]
-
-    gr.Markdown("Click any row to load an example.", elem_classes=["example-log"])
-
-    gr.Examples(
-        examples=examples,
-        inputs=[
-            image_input,
-            offsets_input,
-            original_prompt,
-            edited_prompt,
-            eq_str_input,
-            blend_word_str,
-            is_replace_controller,
-            guidance_scale,
-            num_ddim_steps,
-            cross_replace_steps_input,
-            self_replace_steps_input,
-        ],
-        outputs=[
-            output_final
-        ],
         fn=pipeline,
-        cache_examples=False,
-        examples_per_page=50,
-    )    
+        inputs=[
+            image_input, offsets_input, original_prompt, edited_prompt, 
+            eq_str_input, blend_word_str, is_replace_controller,
+            guidance_scale, num_ddim_steps, cross_replace_steps_input, self_replace_steps_input,
+            original_image_latent
+        ],
+        outputs=[output_final]
+    )
 
 if __name__ == "__main__":
     demo.launch(show_error=True, share=True)
