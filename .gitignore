@@ -254,8 +254,3 @@ pretrained
 .history
 .hydra/**
 *.pyc
-
-*.png
-*.jpg
-*.jpeg
-*.gif
