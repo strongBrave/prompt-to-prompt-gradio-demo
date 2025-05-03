@@ -230,7 +230,7 @@ def process_eq_params_from_text(input_text):
     pairs = [pair.strip() for pair in input_text.split(",") if pair.strip()]
     for pair in pairs:
         try:
-            word, weight = pair.split("-")
+            word, weight = pair.split("-", 1) # For negative weight
             eq_params["words"].append(word.strip())
             eq_params["values"].append(float(weight.strip()))
         except ValueError:
@@ -349,7 +349,10 @@ with gr.Blocks(
             gr.Markdown("### Output Section", elem_classes=["section-title"])
             output_final = gr.Image(height=384, width=384, label="Edited Image", interactive=False, show_download_button=True)
             edited_prompt = gr.Textbox(label="Edited Prompt", placeholder="Enter your edited prompt here")
-            edit_generate_button = gr.Button("Generate Edited Image", elem_id="my_button")
+
+            with gr.Row():
+                edit_generate_button = gr.Button("Generate Edited Image", elem_id="my_button")
+                clear_button = gr.Button("Clear", elem_id="my_button")
 
     with gr.Row():
         with gr.Column(scale=1, elem_classes=["section"]):
@@ -415,9 +418,10 @@ with gr.Blocks(
                 self_replace_steps_input,
             ],
             outputs=[
-                output_final
+                output_final,
+                original_image_latent  # Reset original_image_latent to None when loading examples
             ],
-            fn=pipeline,
+            fn=lambda *args: (None, None),  # Reset outputs
             cache_examples=False,
             examples_per_page=50,
         )
@@ -428,6 +432,11 @@ with gr.Blocks(
         inputs=[original_prompt, num_ddim_steps, guidance_scale],
         outputs=[image_input, original_image_latent],
     )
+
+    clear_button.click(
+        lambda: (None, None, None, None, None, None, None, None),
+        outputs=[image_input, original_prompt, original_image_latent, edited_prompt, output_final, eq_str_input, blend_word_str, original_image_latent],
+    )    
     
     edit_generate_button.click(
         fn=pipeline,
