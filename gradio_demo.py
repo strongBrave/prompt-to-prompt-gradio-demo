@@ -112,10 +112,7 @@ def run_and_display(prompts, controller,
     images, x_t = text2image_ldm_stable(ldm_stable, prompts, controller, latent=latent, num_inference_steps=num_ddim_steps, guidance_scale=guidance_scale, generator=generator, uncond_embeddings=uncond_embeddings, return_type="image")
     if verbose:
         ptp_utils.view_images(images)
-    if images is not None:
-        image = images[1]
-        Image.fromarray(images[1]).save("output1.png")
-        Image.fromarray(images[0]).save("output0.png")
+    # images[0] is the original reconstructed image
     return images[1], x_t
 
 # -------------------------------------------------------------------------
