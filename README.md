@@ -18,7 +18,12 @@ This project demonstrates the use of **Prompt-to-Prompt editing** with **Null In
 - **Attention Control**: Supports Replace, Refine, and Reweight modes for controlling cross-attention layers.
 - **Gradio Interface**: User-friendly interface for uploading images, editing prompts, and visualizing results.
 
-## Requirements
+## Setup
+
+This code was tested with Python 3.9, [Pytorch](https://pytorch.org/) 2.1.1 using  pre-trained models through [huggingface / diffusers](https://github.com/huggingface/diffusers#readme).
+Specifically, we implemented our method over [Stable Diffusion](https://huggingface.co/CompVis/stable-diffusion-v1-4).
+Additional required packages are listed in the requirements file. 
+The code was tested on a RTX3090 24GB.
 
 - Python 3.8+
 - CUDA-enabled GPU
@@ -28,7 +33,6 @@ This project demonstrates the use of **Prompt-to-Prompt editing** with **Null In
   - `transformers`
   - `gradio`
   - `numpy`
-  - `Pillow`
   - `tqdm`
 
 Install dependencies using:
