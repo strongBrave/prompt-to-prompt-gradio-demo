@@ -1,0 +1,8 @@
+torch
+diffusers
+gradio
+pydantic
+numpy
+tqdm
+transformers
+scipy
