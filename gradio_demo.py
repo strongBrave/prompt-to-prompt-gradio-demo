@@ -128,10 +128,13 @@ def pipeline(
     is_replace_controller: bool = False,
     guidance_scale: float = 7.5,
     num_ddim_steps: int = 50,
-    cross_replace_steps_float: float = 0.8,
-    self_replace_steps: float = 0.6,
+    cross_replace_steps_float: Union[float, int] = 0.8,
+    self_replace_steps: Union[float, int] = 0.6,
     original_image_latent=None,
 ):
+    cross_replace_steps_float = float(cross_replace_steps_float)
+    self_replace_steps = float(self_replace_steps)
+
     # 1. preprocess input 
     offsets, prompts, cross_replace_steps, eq_params_output, blend_word = process_format(
         offsets_input, original_prompt, edit_prompt, cross_replace_steps_float, eq_str_input, blend_word_str
